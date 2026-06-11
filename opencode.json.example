@@ -1,0 +1,10 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "plugin": [
+    "opencode-agent-browser",
+    "~/.config/opencode/plugins/opencode-agent-browser.ts"
+  ],
+  "instructions": [
+    "opencode-agent-browser: USE browser* tools for live pages (open URL, click, fill, screenshot, login, QA, localhost UI). SKIP for API/curl, local files, git. Flow: browserDoctor → browserOpen → browserSnapshot → act → browserClose. Chrome stable or Brave only."
+  ]
+}

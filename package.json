@@ -1,0 +1,25 @@
+{
+  "name": "opencode-agent-browser",
+  "version": "1.1.0",
+  "description": "Global OpenCode plugin: agent-browser tools with auto-context injection for AI agents",
+  "type": "module",
+  "main": "src/index.ts",
+  "files": [
+    "src",
+    "commands",
+    "scripts"
+  ],
+  "keywords": [
+    "opencode",
+    "opencode-plugin",
+    "agent-browser",
+    "browser-automation"
+  ],
+  "license": "MIT",
+  "peerDependencies": {
+    "@opencode-ai/plugin": ">=1.0.0"
+  },
+  "scripts": {
+    "install:global": "node scripts/install-global.mjs"
+  }
+}
