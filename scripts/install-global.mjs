@@ -2,6 +2,7 @@
 /**
  * Install opencode-agent-browser as a global OpenCode plugin.
  * - Copies plugin to ~/.config/opencode/plugins/ (auto-loaded at startup)
+ * - Copies helper modules to a plugin-specific subdirectory
  * - Copies slash commands to ~/.config/opencode/commands/
  * - Ensures @opencode-ai/plugin dependency exists
  * - Registers in opencode.jsonc if not already present
@@ -23,9 +24,14 @@ const CONFIG_DIR = process.env.OPENCODE_CONFIG_DIR
 
 const PLUGINS_DIR = path.join(CONFIG_DIR, "plugins");
 const COMMANDS_DIR = path.join(CONFIG_DIR, "commands");
+const SUPPORT_DIR = path.join(PLUGINS_DIR, PLUGIN_NAME);
 const TARGET_PLUGIN = path.join(PLUGINS_DIR, PLUGIN_FILE);
-const TARGET_RUNNER = path.join(PLUGINS_DIR, RUNNER_FILE);
-const TARGET_GUIDANCE = path.join(PLUGINS_DIR, GUIDANCE_FILE);
+const TARGET_RUNNER = path.join(SUPPORT_DIR, RUNNER_FILE);
+const TARGET_GUIDANCE = path.join(SUPPORT_DIR, GUIDANCE_FILE);
+const LEGACY_HELPERS = [
+  path.join(PLUGINS_DIR, RUNNER_FILE),
+  path.join(PLUGINS_DIR, GUIDANCE_FILE),
+];
 
 function toConfigPath(absPath) {
   const normalized = absPath.replace(/\\/g, "/");
@@ -64,6 +70,29 @@ async function ensurePackageJson() {
     await fs.writeFile(pkgFile, JSON.stringify(pkg, null, 2) + "\n", "utf8");
     await installDependencies();
   }
+}
+
+async function removeLegacyHelperFiles() {
+  for (const file of LEGACY_HELPERS) {
+    if (await exists(file)) {
+      await fs.rm(file);
+      console.log(`Removed legacy helper from plugin root -> ${file}`);
+    }
+  }
+}
+
+async function installPluginEntry() {
+  const source = await fs.readFile(path.join(ROOT, "src", "index.ts"), "utf8");
+  const installed = source
+    .replace(
+      /"\.\/opencode-agent-browser-guidance\.js"/g,
+      `"./${PLUGIN_NAME}/opencode-agent-browser-guidance.js"`,
+    )
+    .replace(
+      /"\.\/opencode-agent-browser-runner\.js"/g,
+      `"./${PLUGIN_NAME}/opencode-agent-browser-runner.js"`,
+    );
+  await fs.writeFile(TARGET_PLUGIN, installed, "utf8");
 }
 
 async function installDependencies() {
@@ -127,9 +156,12 @@ async function main() {
   console.log(`Config dir: ${CONFIG_DIR}`);
 
   await fs.mkdir(PLUGINS_DIR, { recursive: true });
+  await fs.mkdir(SUPPORT_DIR, { recursive: true });
   await fs.mkdir(COMMANDS_DIR, { recursive: true });
 
-  await fs.copyFile(path.join(ROOT, "src", "index.ts"), TARGET_PLUGIN);
+  await removeLegacyHelperFiles();
+
+  await installPluginEntry();
   console.log(`Plugin -> ${TARGET_PLUGIN}`);
 
   await fs.copyFile(

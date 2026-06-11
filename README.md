@@ -62,7 +62,7 @@ powershell -ExecutionPolicy Bypass -File .\install.ps1
 bash install.sh
 ```
 
-The installer copies the plugin to `~/.config/opencode/plugins/` and registers it in `opencode.jsonc`.
+The installer copies the plugin entry file to `~/.config/opencode/plugins/`, stores helper modules under `~/.config/opencode/plugins/opencode-agent-browser/`, and registers the entry file in `opencode.jsonc`.
 
 **Restart OpenCode** after install.
 
@@ -186,6 +186,7 @@ See `opencode.json.example`:
 | Problem | Fix |
 |---------|-----|
 | Wrong browser (Chrome for Testing) | `browserClose` then retry — plugin forces `--executable-path` |
+| OpenCode tries to load `opencode-agent-browser-runner.ts` or `opencode-agent-browser-guidance.ts` as plugins | Re-run the installer. It removes old root-level helper files and installs helpers under `plugins/opencode-agent-browser/`. |
 | Refs stale / click fails | `browserSnapshot` again after last action |
 | Page not loaded | `browserWait` mode=load value=networkidle |
 | Switch Chrome ↔ Brave | `browserClose` first, then set `browser: "brave"` |

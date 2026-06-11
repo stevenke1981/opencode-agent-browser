@@ -1,6 +1,6 @@
 {
   "name": "opencode-agent-browser",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Global OpenCode plugin: agent-browser tools with auto-context injection for AI agents",
   "type": "module",
   "main": "src/index.ts",
